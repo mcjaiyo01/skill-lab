@@ -1,0 +1,12 @@
+{
+  "name": "ioconnect-skill-lab",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n watchlist,instrument-details,pricing-service,order-entry,orders-blotter,vendor-news -c cyan,green,yellow,magenta,blue,red \"npm:dev -w watchlist\" \"npm:dev -w instrument-details\" \"npm:dev -w pricing-service\" \"npm:dev -w order-entry\" \"npm:dev -w orders-blotter\" \"npm:dev -w vendor-news\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "ioconnect-onboarding",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Hi, we're a client of interop.io and just got our io.Connect Browser license (the key is in .env as VITE_LICENSE_KEY). We have two small web apps in this folder - customers (Vite, port 4101) and orders (Vite, port 4102). Right now when you click a customer in the customers app we write the id to localStorage and the orders app polls it every second - it's janky and we want to replace it with io.Connect. Users open the customers app first thing in the morning. Please integrate io.Connect properly so selecting a customer shows their orders in the orders app, and get rid of the localStorage hack. Separate browser windows are fine, no docking needed.",
+      "expected_output": "Platform scaffolded or customers app made platform; orders as client; localStorage polling removed; channels or contexts used; app definitions with correct URLs; verification steps provided",
+      "files": [],
+      "assertions": [
+        "No localStorage references remain in customers or orders app source",
+        "Platform (IOBrowserPlatform) initialized in the customers app or a scaffolded launcher, with licenseKey taken from env (not hardcoded)",
+        "Orders app initializes @interopio/browser and receives selection via contexts or channels subscription; the setInterval polling loop is removed",
+        "Orders app definition registered in platform config pointing at http://localhost:4102",
+        "Client handles the opened-outside-platform case gracefully (guard/message instead of silent hang)",
+        "VERIFICATION.md exists with concrete runtime checks (console commands and expected results)"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "We're onboarding onto io.Connect Browser from interop.io. Our setup: a React app (client-list, Vite, port 3000) that our users open first every day, and an Angular 18 app (client-details, port 4200). Nothing is connected yet. We want two things: users should be able to link windows by picking a color channel, and the 'Show client' button in the React app should open/focus the Angular app showing that client even if it's closed. Our license key is available as env var LICENSE_KEY. Please wire this up.",
+      "expected_output": "React app hosts platform (react-hooks provider); Angular app uses @interopio/ng; channel definitions in platform config; ShowClient intent declared in app definition and registered in Angular app; raise from React button",
+      "files": [],
+      "assertions": [
+        "React client-list app hosts the platform (IOBrowserPlatform via IOConnectProvider or equivalent), config kept StrictMode-safe",
+        "Color channel definitions present in platform config and a user-facing channel picker exists in both apps",
+        "ShowClient intent declared in the client-details app definition so the platform can start the app when closed",
+        "Angular app integrates via @interopio/ng and registers the ShowClient intent handler (shows client and focuses window)",
+        "React 'Show client' button raises the intent via io.intents.raise with the client id in context",
+        "VERIFICATION.md exists with concrete runtime checks including the closed-app intent flow"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We're a capital markets firm implementing io.Connect Browser. In this repo: trade-blotter (port 4101) and instrument-chart (port 4102), both vanilla JS Vite apps. Requirements from our architecture team: FDC3 2.x compliance is mandatory (some vendor apps we'll add later use window.fdc3), and traders want the blotter and chart docked side by side in one window with a saveable layout. The blotter is the main app traders open. When a trader clicks a trade row, the chart should show that instrument via an FDC3 broadcast. License key is in .env.",
+      "expected_output": "Platform + workspaces frame app + FDC3: channel definitions with fdc3 metadata, @interopio/fdc3 in both apps, blotter broadcasts fdc3.instrument, chart listens; workspaces config with frame src and includeInWorkspaces",
+      "files": [],
+      "assertions": [
+        "Channel definitions carry FDC3 metadata (fdc3 id / displayMetadata) in the platform config",
+        "Both apps load @interopio/fdc3 (or equivalent) and blotter row click performs an FDC3 broadcast of an fdc3.instrument context",
+        "Chart app listens via addContextListener for fdc3.instrument and routes to existing showInstrument logic",
+        "Workspaces wired end to end: a frame app exists and platform config points workspaces.src at it",
+        "Both app definitions have includeInWorkspaces; a workspace with blotter and chart side by side can be created/restored; layouts persistence configured",
+        "VERIFICATION.md exists with FDC3 compliance checks (e.g. window.fdc3.getInfo) and layout save/restore test"
+      ]
+    }
+  ]
+}

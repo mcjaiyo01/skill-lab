@@ -1,0 +1,4 @@
+{ "name": "vendor-news", "private": true, "version": "3.2.1", "type": "module",
+  "description": "Third-party market news widget (vendor build; we cannot modify its FDC3 usage)",
+  "scripts": { "dev": "vite --port 4106" },
+  "devDependencies": { "vite": "^5.0.0" } }
