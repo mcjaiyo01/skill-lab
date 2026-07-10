@@ -1,5 +1,5 @@
 ---
-name: ioconnect-onboarding
+name: ioconnect-integrator
 description: Integrate the io.Connect Browser SDK (interop.io, formerly Glue42 Core) into existing web applications. Use this skill whenever the user mentions io.Connect, interop.io, Glue42, @interopio packages, FDC3, making their web apps communicate/share data/interoperate, channels, intents, workspaces, or wants to onboard their apps onto an interoperability platform — even if they don't name io.Connect explicitly but are an interop.io client integrating their product.
 ---
 
