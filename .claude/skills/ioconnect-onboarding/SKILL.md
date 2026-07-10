@@ -97,7 +97,18 @@ Finish every engagement by writing `IOCONNECT.md` at the repo root, following th
 - **App definitions are keyed by `name`** and point to the client's URL in `details.url`. A URL typo means the app silently can't be started.
 - **StrictMode double-mount (React)**: initialize io.Connect once outside the component tree or via `IOConnectProvider`, not in a `useEffect` without guards.
 - **Ports/origins**: each app needs a stable dev URL; update app definitions when ports change.
+- **Missing `<meta charset="UTF-8">` breaks built-in UI icons.** The widget / intent-resolver / modals bundles carry their icon glyphs as Unicode private-use characters. If a client page doesn't declare UTF-8 (and the static server doesn't send a charset header), the browser decodes the injected bundle as windows-1252 and every icon renders as mojibake like `î¤`. During discovery, check each app's `index.html` for the charset meta tag and add it if missing — it's a one-line fix that looks like a deep font bug when you hit it.
 - Install the **latest stable** `@interopio/*` packages — there is no version selection step; new clients always get the current release. The only rule: install them all together so they come from the same release line (check the npm registry for the current versions; don't mix majors, and pin what resolves).
+
+## When the references aren't enough
+
+The reference files carry proven patterns, but they are a snapshot — the product evolves. If an API doesn't behave as the references describe, a needed capability isn't covered, or a call fails in a way the references don't explain, do NOT guess. Escalate through these sources in order:
+
+1. **The installed typings** — after `npm install`, the authoritative API for the *exact installed version* is in the client's own repo: `node_modules/@interopio/browser/browser.d.ts`, `node_modules/@interopio/browser-platform/*.d.ts`, and equivalents for every `@interopio/*` package. Grep them for the method or config key in question. This beats any documentation, because it cannot be out of date relative to what's actually running.
+2. **The official documentation** — fetch the relevant section of https://docs.interop.io/browser/ (capabilities: data-sharing, intents, windows/workspaces; developers: browser-client, browser-platform). Use it for concepts and configuration the typings alone don't explain.
+3. **The npm registry** — for version and peer-dependency questions (`npm view @interopio/<pkg> versions peerDependencies`).
+
+When a conflict arises, trust in this order: installed typings > docs > these references. And when you resolve something this way, record what you learned in the handoff document so the client benefits from it too.
 
 ## Reference files
 

@@ -22,6 +22,7 @@ Common failures: missing/invalid `licenseKey` (init rejects — read the error),
 
 1. From the platform page/console: `await io.appManager.application("orders").start()` → new window opens.
 2. In the **new window's** console: `io.interop.instance.application` → "orders". If `IOBrowser()` never resolved: the window was almost certainly opened outside the platform (direct tab) — re-test via `start()`; then check the app definition URL matches exactly (port, path).
+   - **Port drift trap:** dev servers like Vite silently move to the next free port when the pinned one is taken (e.g. a stale server still running). The platform then opens the *old* process — or the wrong app — at the registered URL. Before debugging anything else, confirm nothing stale is listening on the apps' ports and that each dev server actually started on its pinned port.
 3. Back on the platform: `io.appManager.application("orders").instances.length` → 1.
 
 ## Phase: data flows

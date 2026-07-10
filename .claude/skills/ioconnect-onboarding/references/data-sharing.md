@@ -31,7 +31,12 @@ io.channels.my();              // current channel name
 await io.channels.list();      // all channel contexts
 ```
 
-Users need *some* way to pick a channel — but adding it is a UI change, so it requires the client's explicit OK (interview Q9). Options, in order of preference: the built-in **widget** (`browser.widget` in platform config + `widget: { enable: true }` in clients — official UI, no custom code), or a small dropdown calling `join`/`leave` that you provide as a snippet in the handoff document for the client to place themselves. Only build UI directly into their apps when they said yes.
+Users need *some* way to pick a channel — but adding it is a UI change, so it requires the client's explicit OK (interview Q9). Two options, and be transparent about the trade-off rather than silently picking one:
+
+- **Built-in widget** (preferred when feasible): official UI, zero custom code to maintain. But it is not just a flag — the platform config must also serve the widget's `sources` (bundle/styles/fonts URLs, `browser.widget` + `widget` sections), which means hosting those static assets somewhere. In a mature setup that's the right answer.
+- **Minimal custom picker** (a small dropdown calling `join`/`leave`): acceptable when the widget's asset-hosting step is real friction (early dev stage, no static hosting yet). If you go this way, say so explicitly — tell the client you chose a temporary picker over the official widget and why, and put the widget migration snippet in the handoff's "not added yet" section so the custom picker is understood as a stepping stone, not the end state.
+
+Only build UI directly into their apps when they said yes (Q9); otherwise deliver the picker as a handoff snippet.
 
 ## Shared Contexts
 

@@ -23,6 +23,8 @@ const App = () => <Workspaces />;   // components prop allows full customization
 
 The frame app itself initializes as a normal client (`IOBrowser` via `IOConnectProvider`). Start with zero customization; the `components` prop (custom tabs, header, popups) is a later refinement.
 
+**Do NOT wrap the frame in React `<StrictMode>`.** The workspaces UI performs a one-time "hello" handshake with the platform on mount; StrictMode's dev double-mount tears the first mount down before the handshake completes and the platform rejects with a "frame did not send a hello in time" error. This was discovered in a real run — it costs an hour of confusion if you don't know it. The frame is a dedicated shell app, so losing StrictMode there is harmless.
+
 **Web-components frame (vanilla):** use `@interopio/workspaces-ui-web-components` and its `<workspaces-element>` if the client avoids React.
 
 ## 2. Platform wiring

@@ -1,43 +1,59 @@
 # Onboarding Interview
 
-Goal: learn what the discovery scan cannot tell you — the *business* data flows and user workflows. Keep it short; ask only questions whose answers change what you build. Skip anything already answered by the codebase or by the user's initial message.
+Goal: learn what the discovery scan cannot tell you — the *business* data flows and user workflows. The client knows what they want their apps to DO; they do not know io.Connect's APIs. So every question must be phrased in behavior terms, never in product terms ("should the other app open by itself?", not "do you want intents?"). You translate answers into APIs; they never need to.
 
-## Core questions (almost always ask)
+Three rules for asking:
 
-**1. Which app should be the entry point?**
-"When your users start their day, which app do they open first?" That app (or a small new launcher page) becomes/hosts the platform. If no natural candidate exists, recommend scaffolding a minimal launcher — a page with buttons that start the other apps.
+1. **Confirm, don't interrogate.** You ran discovery first — use it. A question grounded in their code ("I see the watchlist writes the selection to localStorage and orders polls it — should selecting an instrument always update orders, or only when the user links the two windows?") is far easier for a non-expert to answer than an open-ended one. Prefer proposing something concrete they can correct.
+2. **Only ask what changes what you build.** Skip anything already answered by the codebase or their initial message. Environment/deployment/security questions are noise at this stage.
+3. **Batch.** 3–4 questions per message (or one AskUserQuestion call). Full interview should be ~10–12 interactions max across two rounds.
 
-**2. What should the apps share?**
-"Give me 2–3 concrete examples of information that should flow between apps. E.g., 'when a user picks a customer in App A, App B should show that customer's orders.'"
-Capture for each flow: source app, target app(s), the data shape, and the trigger (user click? automatic?).
+## Round 1 — the shape of things (always)
 
-**3. Who controls the linking?**
-"Should users choose which windows are linked together (e.g., pick a color channel per window), or should the apps always stay in sync automatically?"
-- User chooses → **Channels**
-- Always in sync → **Shared Contexts**
-- One-off commands with a reply → **Interop methods**
-- "Open/show X wherever appropriate" → **Intents**
+**1. Entry point.** "When your users start their day, which app do they open first?" That app (or a small new launcher page) becomes/hosts the platform. If no natural always-open candidate exists, propose scaffolding a minimal launcher — don't force a business app to be the broker if users sometimes close it.
 
-**4. Window management ambitions?**
-"Do you want apps docked together in one window with tabs and splits the user can rearrange and save (→ Workspaces), or are separate browser windows fine (→ plain window management + optional Layouts)?"
+**2. The flows.** "Give me the 2–3 most valuable examples of information that should move between apps — e.g. 'when a user picks a customer in App A, App B should show that customer's orders'." Seed this with discovery findings: name the flows their existing glue (postMessage/localStorage/BroadcastChannel) already carries and ask which to keep. Just collect the list here; the drill-down comes next.
 
-## Conditional questions
+**3. Window ambitions.** "Docked together in one window with tabs and splits the user can rearrange and save, or separate browser windows?" → Workspaces vs plain windows + optional Layouts.
 
-**5. FDC3** (ask if finance domain, or third-party apps are involved): "Do you need to comply with the FDC3 standard, or integrate third-party apps that already speak FDC3?" If yes → fdc3.md; define channels with FDC3 metadata from day one.
+## Round 2 — drill-down per flow (the part that picks the API)
 
-**6. Persistence** (ask if layouts/workspaces are in scope): "Should saved layouts/preferences survive across browsers and machines (→ REST store you host, or io.Manager), or is per-browser storage fine (→ IndexedDB/session)?" Default for a first integration: `idb`.
+For EACH flow from question 2, walk this probe matrix. Every probe is a behavior question the client can answer without knowing any API; each answer eliminates options from the decision table in SKILL.md.
 
-**7. Rollout order** (ask if >3 apps): "Which two apps, if connected, would deliver the most value? We'll start there." Never integrate everything at once.
+| Probe (ask in their app names) | Answer → implication |
+|---|---|
+| "Does this happen when the user clicks something, or does it flow continuously?" | click/event → context, method, or intent; continuous feed → **stream** |
+| "Does the sending app need an answer back, or is it fire-and-forget?" | needs a reply → **interop method (RPC)**; fire-and-forget → context/channel/stream |
+| "Should the receiving apps ALWAYS follow this, or should the user choose which windows are linked?" | always → **shared context**; user chooses → **channels** |
+| "If the receiving app isn't open, what should happen — nothing, or should it open by itself and show the data?" | open itself → **intent** (declared in the app definition so the platform can start it) |
+| "Can a user have two copies of the same app open with DIFFERENT data (two clients, two portfolios)?" | yes → channels or workspace-scoped context, NOT a global context |
 
-**8. License key**: "Do you have your io.Connect license key available (from your interop.io representative)? We'll put it in an env var, never in source."
+Two or three probes usually settle a flow — stop as soon as the API is unambiguous. Present the drill-down as confirmations where discovery lets you ("clicking a trade row currently just logs a TODO — I assume the chart should react instantly and there's no reply needed, correct?").
 
-**9. UI affordances** (ask whenever the plan involves channels, launching, or anything user-visible): "Some features have a user-facing side — e.g. a channel picker so users choose what's linked, or launch buttons. Should I add any visible UI to your apps, or keep all changes invisible and give you ready-made snippets to add yourself?" Default when unanswered: **invisible** — wire the plumbing, put the snippets in the handoff document.
+## Round 2 — conditionals (ask only when triggered)
+
+**FDC3** (finance domain, or third-party/vendor apps present): "Do you need to comply with the FDC3 standard, or run third-party apps that already expect `window.fdc3`?" If yes → fdc3.md; give channels FDC3 metadata from day one. If they decline, record it in the handoff as a documented follow-up — do not implement it anyway.
+
+**Persistence** (layouts/workspaces in scope): "Should saved layouts survive across browsers and machines (→ REST store you host, or io.Manager), or is per-browser fine for now (→ `idb`)?" Default: `idb`.
+
+**Rollout order** (>3 apps): "Which two apps, if connected, would deliver the most value? We'll start there." Never integrate everything at once.
+
+**License key:** "Do you have your io.Connect license key (from your interop.io representative)? We'll put it in an env var, never in source."
+
+**UI affordances** (whenever the plan involves channels, launching, or anything user-visible): "Some features have a user-facing side — e.g. a channel picker so users choose what's linked. Should I add visible UI to your apps, or keep every change invisible and give you ready-made snippets?" Default when unanswered: **invisible**. If they want a channel picker, see data-sharing.md for the widget-vs-custom trade-off and be explicit about which you chose.
+
+## Closing question — always ask, highest value per word
+
+**"Describe the demo you'd show your boss when this works — step by step, what do you click and what happens?"**
+
+Their answer IS the acceptance scenario: it drives the Phase 5 verification script and the "How to verify" section of the handoff, in their own words. If a step in their demo needs a capability no flow covered, you just found a missing requirement — cheaper now than after implementation.
 
 ## Interpreting answers → plan
 
-Write the plan as: platform choice, client conversion order, one row per data flow with the chosen API, optional layers (workspaces/FDC3/notifications), and the verification approach. Keep it under a page. Ask for approval.
+Write the plan as: platform choice, client conversion order, one row per data flow with the chosen API **and the probe answer that chose it**, optional layers (workspaces/FDC3/notifications), the demo scenario as acceptance criteria, and the verification approach. Keep it under a page. Ask for approval.
 
 Red flags to address in the plan:
 - All apps are routes of a single SPA → interop still works (each route opened as a separate window/app), but discuss whether they want multi-window at all.
 - Existing postMessage/BroadcastChannel glue → plan its replacement explicitly, flow by flow; don't leave two parallel mechanisms.
 - No clear "first app users open" → scaffold the minimal launcher; do not force one of their apps to be the platform if it's sometimes not open.
+- A flow whose probes contradict each other (e.g. "always in sync" + "two copies with different data") → surface the contradiction to the client before choosing; usually it means workspace-scoped context.
