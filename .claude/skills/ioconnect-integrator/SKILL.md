@@ -29,15 +29,17 @@ A license key from interop.io is required in the platform config (`licenseKey`).
 
 Work through six phases in order. Do not skip the interview, and do not write code before the user approves the plan.
 
-### Phase 1 — Discover
+### Phase 1 — Scope, then discover
 
-Scan the codebase before asking anything. Determine:
+Do NOT deep-read the whole repo. In real codebases most apps are ones the client has no intention of integrating — scanning them wastes time and fills your context with code you must not touch. Work in three steps:
 
-- How many distinct web apps exist, and where (monorepo? separate folders? one SPA with routes?)
-- Framework per app: React, Angular, vanilla, other (Vue/Svelte — supported via the vanilla approach)
-- Build tooling and dev servers (Vite/webpack/CRA/Angular CLI), ports, how apps are served
-- Whether any interop-ish glue already exists (postMessage handlers, shared localStorage, BroadcastChannel, query-param passing) — these are candidates for replacement and reveal what data the apps already share
-- Existing `@interopio/*` dependencies (a previous integration attempt to build on?)
+1. **Shallow inventory** (cheap): locate the distinct web apps — package.json files, folder names, titles, monorepo layout. No source reading yet.
+2. **Ask for targets**: show the inventory and ask which apps should be interop-enabled — "Which of these do you want connected? Anything I must not touch?" Skip the question only when the user already named the targets in their request.
+3. **Deep-scan the targets only**:
+   - Framework per app: React, Angular, vanilla, other (Vue/Svelte — supported via the vanilla approach)
+   - Build tooling and dev servers (Vite/webpack/CRA/Angular CLI), ports, how apps are served
+   - Interop-ish glue between the targets (postMessage handlers, shared localStorage, BroadcastChannel, query-param passing) — candidates for replacement that reveal what data the apps already share
+   - Existing `@interopio/*` dependencies (a previous integration attempt to build on?)
 
 Summarize findings to the user in a few sentences before the interview.
 

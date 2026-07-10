@@ -12,8 +12,6 @@ Three rules for asking:
 
 **1. The always-open app (platform host).** Explain the stakes BEFORE asking, so the client understands what their answer decides: "One app will act as the hub — it runs the communication between all the others and has to stay open the whole session; if it closes, the other apps disconnect. Is there an app or start page your users genuinely keep open all day? Would anything break for them if someone closed it at lunch?"
 
-If the client names an app but hesitates on the "closed at lunch" test, or no clear candidate exists, default to scaffolding a minimal launcher page — one tiny extra app beats a business app doubling as the broker.
-
 **2. The flows.** "Give me the 2–3 most valuable examples of information that should move between apps — e.g. 'when a user picks a customer in App A, App B should show that customer's orders'." Seed this with discovery findings: name the flows their existing glue (postMessage/localStorage/BroadcastChannel) already carries and ask which to keep. Just collect the list here; the drill-down comes next.
 
 **3. Window ambitions.** "Docked together in one window with tabs and splits the user can rearrange and save, or separate browser windows?" → Workspaces vs plain windows + optional Layouts.
