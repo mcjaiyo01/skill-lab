@@ -10,7 +10,9 @@ Three rules for asking:
 
 ## Round 1 — the shape of things (always)
 
-**1. Entry point.** "When your users start their day, which app do they open first?" That app (or a small new launcher page) becomes/hosts the platform. If no natural always-open candidate exists, propose scaffolding a minimal launcher — don't force a business app to be the broker if users sometimes close it.
+**1. The always-open app (platform host).** Explain the stakes BEFORE asking, so the client understands what their answer decides: "One app will act as the hub — it runs the communication between all the others and has to stay open the whole session; if it closes, the other apps disconnect. Is there an app or start page your users genuinely keep open all day? Would anything break for them if someone closed it at lunch?"
+
+If the client names an app but hesitates on the "closed at lunch" test, or no clear candidate exists, default to scaffolding a minimal launcher page — one tiny extra app beats a business app doubling as the broker.
 
 **2. The flows.** "Give me the 2–3 most valuable examples of information that should move between apps — e.g. 'when a user picks a customer in App A, App B should show that customer's orders'." Seed this with discovery findings: name the flows their existing glue (postMessage/localStorage/BroadcastChannel) already carries and ask which to keep. Just collect the list here; the drill-down comes next.
 
@@ -55,5 +57,5 @@ Write the plan as: platform choice, client conversion order, one row per data fl
 Red flags to address in the plan:
 - All apps are routes of a single SPA → interop still works (each route opened as a separate window/app), but discuss whether they want multi-window at all.
 - Existing postMessage/BroadcastChannel glue → plan its replacement explicitly, flow by flow; don't leave two parallel mechanisms.
-- No clear "first app users open" → scaffold the minimal launcher; do not force one of their apps to be the platform if it's sometimes not open.
+- No app that reliably stays open all day → scaffold the minimal launcher; do not force one of their apps to be the platform if it's sometimes closed.
 - A flow whose probes contradict each other (e.g. "always in sync" + "two copies with different data") → surface the contradiction to the client before choosing; usually it means workspace-scoped context.
